@@ -1,0 +1,52 @@
+{
+  "name": "@portaless/plugin-sdk",
+  "version": "0.1.0",
+  "description": "MIT-licensed public surface for third-party Portaless plugin authors: the capability catalog, manifest validation, and the typed sandbox contract. Self-contained — no AGPL code is imported.",
+  "license": "MIT",
+  "author": "Gerardo Loyola",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/geroiloyola/portaless-plugin-sdk.git"
+  },
+  "homepage": "https://github.com/geroiloyola/portaless-plugin-sdk#readme",
+  "bugs": {
+    "url": "https://github.com/geroiloyola/portaless-plugin-sdk/issues"
+  },
+  "keywords": [
+    "portaless",
+    "plugin",
+    "sdk",
+    "capabilities",
+    "sandbox",
+    "manifest"
+  ],
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json && esbuild src/index.ts --bundle --format=esm --platform=neutral --outfile=dist/index.js",
+    "test": "node --test tests/*.test.mjs",
+    "verify:license": "node -e 'const fs=require(\"node:fs\"); const p=JSON.parse(fs.readFileSync(\"package.json\",\"utf8\")); if(p.license!==\"MIT\") process.exit(1); if(!fs.readFileSync(\"LICENSE\",\"utf8\").includes(\"MIT License\")) process.exit(1); console.log(\"[verify:license] MIT + LICENSE OK\");'",
+    "smoke:tarball": "node scripts/smoke-tarball.mjs",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "esbuild": "^0.27.0",
+    "typescript": "~5.6.3"
+  }
+}
