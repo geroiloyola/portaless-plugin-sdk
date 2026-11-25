@@ -1,0 +1,79 @@
+name: Release Plugin SDK
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to build and upload assets for"
+        required: true
+        default: "v0.1.0"
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build, Verify & Upload Release Tarball (Node 24)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Determine release tag
+        id: meta
+        env:
+          INPUT_TAG: ${{ inputs.tag }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          if [ -n "$INPUT_TAG" ]; then
+            echo "tag=$INPUT_TAG" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=$REF_NAME" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.meta.outputs.tag }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Build dist/ (ESM .js + .d.ts)
+        run: npm run build
+
+      - name: Run unit tests
+        run: npm test
+
+      - name: Verify MIT license metadata and LICENSE file
+        run: npm run verify:license
+
+      - name: Run clean-room tarball smoke test
+        run: npm run smoke:tarball
+
+      - name: Pack release tarball and SHA256SUMS
+        run: |
+          mkdir -p "${RUNNER_TEMP}/release"
+          npm pack --pack-destination "${RUNNER_TEMP}/release"
+          (cd "${RUNNER_TEMP}/release" && sha256sum *.tgz > SHA256SUMS && cat SHA256SUMS)
+
+      - name: Create release (if missing) and upload assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.meta.outputs.tag }}
+        run: |
+          set -euo pipefail
+          if ! gh release view "${TAG}" >/dev/null 2>&1; then
+            gh release create "${TAG}" \
+              --title "@portaless/plugin-sdk ${TAG}" \
+              --notes "Release ${TAG} of @portaless/plugin-sdk (MIT)."
+          fi
+          gh release upload "${TAG}" \
+            "${RUNNER_TEMP}/release/"*.tgz \
+            "${RUNNER_TEMP}/release/SHA256SUMS" \
+            --clobber
