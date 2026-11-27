@@ -2,15 +2,6 @@ MIT License
 
 Copyright (c) 2026 Gerardo Loyola
 
-This license applies exclusively to the contents of `packages/plugin-sdk` —
-the public Plugin SDK surface of Portaless: types, interfaces, the capability
-catalog, manifest validation and capability-bridge contracts, published for
-third-party plugin authors to import.
-
-It does NOT apply to the rest of the Portaless repository (the core:
-`functions/`, `src/`, and all other `packages/` directories), which is licensed
-under AGPL-3.0 — see `../../LICENSE`.
-
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the
 "Software"), to deal in the Software without restriction, including
@@ -30,7 +21,7 @@ OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 
-Rationale: this permissive license exists specifically so that a third-party
-plugin author who imports these types/interfaces into a closed-source plugin
-never incorporates AGPL-3.0 code merely by consuming the SDK. See
-`../../docs/architecture/licensing-boundaries.md`.
+Note: this license applies to `@portaless/plugin-sdk` (`geroiloyola/portaless-plugin-sdk`),
+the public Plugin SDK surface for third-party Portaless plugin authors. The Portaless
+host repository (`geroiloyola/portaless`) is separately licensed under AGPL-3.0-or-later;
+see https://github.com/geroiloyola/portaless/blob/main/docs/architecture/licensing-boundaries.md.
